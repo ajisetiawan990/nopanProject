@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PengaduanController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TanggapanController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,13 +18,13 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard Redirect Berdasarkan Role
+| Semua Route Setelah Login
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard utama (redirect berdasarkan role di controller)
+    // Redirect dashboard berdasarkan role
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
@@ -32,8 +34,13 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:admin')->group(function () {
+
         Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
             ->name('admin.dashboard');
+
+        Route::post('/admin/verifikasi/{id}', 
+            [AdminController::class, 'verifikasi'])
+            ->name('admin.verifikasi');
     });
 
     /*
@@ -42,8 +49,17 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:petugas')->group(function () {
+
         Route::get('/petugas/dashboard', [DashboardController::class, 'petugas'])
             ->name('petugas.dashboard');
+
+        Route::get('/tanggapan/create/{id}', 
+            [TanggapanController::class, 'create'])
+            ->name('tanggapan.create');
+
+        Route::post('/tanggapan/store/{id}', 
+            [TanggapanController::class, 'store'])
+            ->name('tanggapan.store');
     });
 
     /*
@@ -65,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/pengaduan', [PengaduanController::class, 'store'])
             ->name('pengaduan.store');
     });
+
 });
 
 require __DIR__.'/auth.php';

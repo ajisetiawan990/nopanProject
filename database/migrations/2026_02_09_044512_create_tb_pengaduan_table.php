@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('tgl_pengaduan');
             $table->foreignId('id_user')->references('id')->on('users');
             $table->string('isi_laporan');
-            $table->enum('status' , ['proses','selesai']);
+            $table->enum('status' , ['proses','selesai'])->default('proses');
             $table->timestamps();
         });
     }

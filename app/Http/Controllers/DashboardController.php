@@ -9,7 +9,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Redirect otomatis berdasarkan role
         $role = Auth::user()->role;
 
         return match ($role) {
@@ -20,21 +19,28 @@ class DashboardController extends Controller
         };
     }
 
+    // ✅ ADMIN
     public function admin()
     {
-        return view('admin.dashboard');
+        $pengaduan = Pengaduan::with('tanggapan')->get();
+
+        return view('admin.dashboard', compact('pengaduan'));
     }
 
+    // ✅ PETUGAS
     public function petugas()
     {
-        return view('petugas.dashboard');
+        $pengaduan = Pengaduan::with('tanggapan')->get();
+
+        return view('petugas.dashboard', compact('pengaduan'));
     }
 
+    // ✅ MASYARAKAT
     public function masyarakat()
     {
-        $pengaduan = Pengaduan::where('id_user', Auth::id())
-                        ->orderBy('tgl_pengaduan', 'desc')
-                        ->get();
+        $pengaduan = Pengaduan::with('tanggapan')
+            ->where('id_user', Auth::id()) // supaya hanya lihat miliknya
+            ->get();
 
         return view('masyarakat.dashboard', compact('pengaduan'));
     }

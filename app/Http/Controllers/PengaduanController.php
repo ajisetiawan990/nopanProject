@@ -12,10 +12,9 @@ class PengaduanController extends Controller
     // Tampilkan daftar pengaduan milik user
     public function index()
     {
-        $pengaduan = Pengaduan::where('id_user', Auth::id())
-                       ->orderBy('tgl_pengaduan', 'desc')
-                       ->get();
+        $pengaduan = Pengaduan::get();
 
+        return view('masyarakat.dashboard', compact('pengaduan'));
     }
 
     // Form tambah pengaduan
@@ -25,23 +24,21 @@ class PengaduanController extends Controller
     }
 
     // Simpan pengaduan
-public function store(Request $request)
-{
-    if (Auth::user()->role !== 'masyarakat'){
-        abort(403);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'isi_laporan' => 'required|string'
+        ]);
+
+        Pengaduan::create([
+            'tgl_pengaduan' => now(),
+            'id_user'       => Auth::id(), // 🔥 WAJIB ADA
+            'isi_laporan'   => $request->isi_laporan,
+            'status'        => 'proses'
+        ]);
+
+        return redirect()
+            ->route('pengaduan.index')
+            ->with('success', 'Pengaduan berhasil dikirim');
     }
-    $request->validate([
-        'isi_laporan' => 'required|string|max:255'
-    ]);
-
-    Pengaduan::create([
-        'tgl_pengaduan' => now(),
-        'id_user' => Auth::id(),
-        'isi_laporan' => $request->isi_laporan,
-        'status' => 'proses'
-    ]);
-
-    return redirect()->route('masyarakat.dashboard');
-}
-
 }
